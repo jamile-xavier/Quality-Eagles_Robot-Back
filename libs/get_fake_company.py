@@ -1,12 +1,7 @@
 from faker import Faker
 import unicodedata
 import re
-
-faker = Faker('pt-BR')
-
-from faker import Faker
-import unicodedata
-import re
+from robot.api.deco import keyword
 
 faker = Faker('pt-BR')
 
@@ -37,6 +32,12 @@ def limpar_cnpj(cnpj):
     cnpj_sem_acentos = remover_acentos(cnpj)
     return cnpj_sem_acentos.replace('.', '').replace('-', '')
 
+def limpar_telefone(telefone):
+    """Remove espaços e caracteres especiais do número de telefone."""
+    telefone_sem_acentos = remover_acentos(telefone)
+    return re.sub(r'[^+\d]', '', telefone_sem_acentos)
+
+@keyword("Get Fake Company")
 def get_fake_company():
     """Gera dados de empresa fictícia com formatação adequada."""
     return {
@@ -46,4 +47,11 @@ def get_fake_company():
         "fantasyName": faker.bs(),
         "serviceDescription": faker.catch_phrase(),
         "responsibleName": limpar_ponto_nome(faker.name()),
+        "phone": limpar_telefone(faker.cellphone_number()),
+        "zipCode": faker.postcode(False),
+        "city": faker.city(),
+        "neighborhood": faker.bairro(),
+        "number": faker.building_number(),
+        "state":  faker.estado_sigla(),
+        "street": faker.street_name(),
            } 

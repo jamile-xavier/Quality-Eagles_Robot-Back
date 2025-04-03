@@ -1,0 +1,35 @@
+LOGIN:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /login
+
+COMPANY:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /company
+
+COMPANY_COUNT:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /company/count
+
+COMPANY_ADDRESS:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /company/address
+
+COMPANY_STATUS:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /company/status
+
+USER:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /user
+
+USER_COUNT:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /user/count
+
+USER_PASSWORD:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /user/password
+
+USER_STATUS:
+  url: https://quality-eagles.qacoders.dev.br/api
+  endpoint: /user/status

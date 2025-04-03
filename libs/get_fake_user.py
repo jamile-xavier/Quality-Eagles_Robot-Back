@@ -1,12 +1,7 @@
 from faker import Faker
 import unicodedata
 import re
-
-faker = Faker('pt-BR')
-
-from faker import Faker
-import unicodedata
-import re
+from robot.api.deco import keyword
 
 faker = Faker('pt-BR')
 
@@ -37,7 +32,8 @@ def limpar_cpf(cpf):
     cpf_sem_acentos = remover_acentos(cpf)
     return cpf_sem_acentos.replace('.', '').replace('-', '')
 
-def get_fake_person():
+@keyword("Get Fake User")
+def get_fake_user():
     """Gera dados de pessoa fictícia com formatação adequada."""
     return {
         "name": limpar_ponto_nome(faker.name()),
