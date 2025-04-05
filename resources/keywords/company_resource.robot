@@ -1,6 +1,7 @@
 *** Settings ***
 Variables      ../../fixtures/environments.yaml
 Resource    ../tests/login.robot
+Resource    ../pages/company_variables.robot
 Library    ../../libs/get_fake_company.py
 Library    Collections
 Library    Dialogs
@@ -101,37 +102,12 @@ Listar empresa por id
     ${response}    GET On Session    alias=quality-eagles    url=${url}
     RETURN         ${response}
 
-Atualizar endereço da empresa
-    [Documentation]    Keyword para atualizar o endereço da empresa
-    ${companyFake}    Get Fake Company
-    ${response}    Cadastro Empresa Sucesso
-    ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}
-    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
-    ${address}=    Create List
-    ${addressItem}=    Create Dictionary
-    ...    zipCode=90906874
-    ...    city=Vilhena
-    ...    state=SP
-    ...    district=Sossego
-    ...    street=Alameda Getúlio Vargas
-    ...    number=727
-    ...    complement=de 4500 ao fim - lado par
-    ...    country=Brasil
-    Append To List    ${address}    ${addressItem}
-    ${body}=    Create Dictionary
-    ...    corporateName=${response.json()["newCompany"]["corporateName"]}
-    ...    registerCompany=${response.json()["newCompany"]["registerCompany"]}
-    ...    mail=${response.json()["newCompany"]["mail"]}
-    ...    matriz=Teste
-    ...    responsibleContact=${response.json()["newCompany"]["responsibleContact"]}
-    ...    telephone=${response.json()["newCompany"]["telephone"]}
-    ...    serviceDescription=${response.json()["newCompany"]["serviceDescription"]}
-    ...    address=${address}
-    ${response}    PUT On Session    alias=quality-eagles    url=/${COMPANY_ADDRESS.url}${COMPANY_ADDRESS.endpoint}/${company_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+ 
 
 Atualizar status da empresa
     [Documentation]    Keyword para atualizar o status da empresa
     [Arguments]    ${status}
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${company_fake}    Get Fake Company
     ${response}    Cadastro Empresa Sucesso
     ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}

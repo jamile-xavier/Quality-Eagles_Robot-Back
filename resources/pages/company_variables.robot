@@ -20,7 +20,7 @@ ${STREET_COMPANY_DUPLICATE}    Boulevard Vagner Frances
 ${NUMBER_COMPANY_DUPLICATE}    124
 
 
-# Dados para teste de cadastro de empresa inválido
+# Dados para teste de cadastro de empresa inválido e atualização de endereço
 ${CORPORATE_NAME}    Comércio TechInnovate Educação
 ${REGISTER_COMPANY}    14686715000154
 ${MAIL_COMPANY}    comercial@techinnovate.com.br
