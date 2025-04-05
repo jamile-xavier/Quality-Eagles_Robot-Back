@@ -47,7 +47,7 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: https://jamile-xavier.github.io/robot_back/report.html
+      url: https://jamile-xavier.github.io/Quality-Eagles_Robot-Back/report.html
 
     steps:
       - name: Setup Pages
