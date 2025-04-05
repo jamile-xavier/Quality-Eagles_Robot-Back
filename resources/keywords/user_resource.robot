@@ -31,7 +31,7 @@ Criar usuário
 
 Cadastro usuário com sucesso
     [Documentation]    Keyword para realizar cadastro de usuário
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${user}        Get Fake User
     ${idUser}       Criar Usuário     ${user}    ${TOKEN_USER}
 

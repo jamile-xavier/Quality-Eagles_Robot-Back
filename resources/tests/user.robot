@@ -4,14 +4,17 @@ Resource    ../pages/login_variables.robot
 Resource    ../keywords/user_resource.robot
 Resource    ../pages/user_variables.robot
 
+Library    RequestsLibrary
+Library    Collections
+
 *** Test Cases ***
 TC01 - Cadastro de usuário com sucesso
     [Documentation]    Realizar um cadastro de usuário com sucesso
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
     ${response}      Criar usuário    ${person}    ${TOKEN_USER}
 
-    Should Be Equal As Strings    ${response.status_code}    201
+    Status Should Be  201
 
     #Validar campos
     ${userData}    Set Variable    ${response.json()["user"]}
@@ -25,64 +28,57 @@ TC01 - Cadastro de usuário com sucesso
 
 TC02 - Cadastrar usuário com nome com mais de 100 caracteres
     [Documentation]    Cadastrar usuário com nome com mais de 100 caracteres
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}        Get Fake User
     ${response}     Cadastro manual de usuário
-    ...    fullName=Isabella Oliveira Valo Velho Barro Preto Botafogo Santana Padre Clemente Henrique Moussier Uruguai Teresina Robert Spengler Neto
-    ...    mail=isabelaoliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders.com.br
-    ...    cpf=78599154719
-    ...    password=5qLPT$6vpPfj
-    ...    confirmPassword= 5qLPT$6vpPfj
-    Status Should Be    400    ${response}
+    ...    fullName=${INVALID_FULLNAME}
+    ...    mail=${person}[email]
+    ...    cpf=${person}[cpf]
+    ...    password=${person}[password]
+    ...    confirmPassword=${person}[password]
+    Status Should Be    400    
+   # Should Be Equal    ${response.json()['error']}    O nome completo deve ter no máximo 100 caracteres.
 
-TC03 - Cadastrar usuário com espaço no e-mail
+TC03 - Cadastrar usuário com e-mail inválido
     [Documentation]    Cadastrar usuário com espaço entre o nome e sobrenome no e-mail
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}        Get Fake User
     ${response}     Cadastro manual de usuário
-    ...    fullName=Isabella Oliveira 
-    ...    mail=isabela oliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders.com.br
-    ...    cpf=78599154719
-    ...    password=5qLPT$6vpPfj
-    ...    confirmPassword= 5qLPT$6vpPfj
+    ...    fullName=${person}[name]
+    ...    mail=${INVALID_MAIL}
+    ...    cpf=${person}[cpf]
+    ...    password=${person}[password]
+    ...    confirmPassword= ${person}[password]
     Status Should Be    400    ${response}
     Should Be Equal As Strings   ${response.json()["error"][1]}    O e-mail informado é inválido. Informe um e-mail no formato [nome@domínio.com]. 
 
 TC04- Cadastrar usuário com senha inválida
     [Documentation]    Cadastrar usuário com um e-mail inválido
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}        Get Fake User
     ${response}     Cadastro manual de usuário
-    ...    fullName=Isabella Oliveira
-    ...    mail=isabela oliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders.com.br
-    ...    cpf=78599154719
-    ...    password=5qLPT6vpPfj
-    ...    confirmPassword= 5qLPT6vpPfj
+    ...    fullName=${person}[name]
+    ...    mail=${person}[email]
+    ...    cpf=${person}[cpf]
+    ...    password=${INVALID_PASSWORD}
+    ...    confirmPassword= ${INVALID_PASSWORD}
     Status Should Be    400    ${response}
+    Should Be Equal As Strings   ${response.json()["error"][2]}     Senha precisa ter: uma letra maiúscula, uma letra minúscula, um número, um caractere especial(@#$%) e tamanho entre 8-12.
 
-TC05 - Cadastrar usuário com e-mail inválido
-    [Documentation]    Cadastrar usuário com um e-mail inválido
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
-    ${response}     Cadastro manual de usuário
-    ...    fullName=Isabella Oliveira
-    ...    mail=isabelaoliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders
-    ...    cpf=78599154719
-    ...    password=5qLPT$6vpPfj
-    ...    confirmPassword= 5qLPT$6vpPfj
-    Status Should Be    400    ${response}
-    Should Be Equal As Strings   ${response.json()["error"][1]}    O e-mail informado é inválido. Informe um e-mail no formato [nome@domínio.com]. 
-
-
-TC06 - Cadastrar usuário com CPF em branco
+TC05 - Cadastrar usuário com CPF em branco
     [Documentation]    Cadastrar usuário com o CPF em branco
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}        Get Fake User
     ${response}     Cadastro manual de usuário
-    ...    fullName=Isabella Oliveira
-    ...    mail=isabela oliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders.com.br
-    ...    cpf=
-    ...    password=5qLPT$6vpPfj
-    ...    confirmPassword= 5qLPT$6vpPfj
-    Status Should Be    400    ${response}
+    ...    fullName=${person}[name]
+    ...    mail=${person}[email]
+    ...    cpf=${CPF_BLANK}
+    ...    password=${person}[password]
+    ...    confirmPassword= ${person}[password]
+    Status Should Be    400    
     Should Be Equal As Strings   ${response.json()["error"][2]}    Deve preencher o CPF com 11 dígitos
 
-TC07 - Exclusão de usuário com sucesso
+TC06 - Exclusão de usuário com sucesso
     [Documentation]    Deletar um usuário existente
     ${response}    Cadastro usuário com sucesso        
     ${userId}       Set Variable    ${response.json()["user"]["_id"]}
@@ -92,24 +88,24 @@ TC07 - Exclusão de usuário com sucesso
 
     # Validações
     Status Should Be    200   
-    Should Be Equal    Usuário deletado com sucesso!.    ${response["msg"]}  
+    Should Be Equal    ${response["msg"]}      Usuário deletado com sucesso!.
 
-TC08 - Exclusão de usuário com id inválido
+TC07 - Exclusão de usuário com id inválido
     [Documentation]     Validar acesso negado à exclusão de usuários informando um id inválido
     ${response}=    DELETE On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}   expected_status=any
     Status Should Be    400    ${response}
     Should Be Equal As Strings   ${response.json()["alert"][0]}    Esse usuário não existe em nossa base de dados.
 
-TC09 - Exclusão de usuário com token em branco
+TC08 - Exclusão de usuário com token em branco
     [Documentation]     Validar acesso negado à exclusão de usuários com token em branco
     ${response}=    DELETE On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}   expected_status=any
     Status Should Be    403     ${response}
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC10 - Listagem de usuário com sucesso
+TC09 - Listagem de usuário com sucesso
     [Documentation]    Listar todos os usuários cadastrados
     ${response}    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/?token=${TOKEN_USER}
-    Status Should Be    200    ${response}
+    Status Should Be    200   
 
    # Validar estrutura da resposta
     ${userData}    Set Variable    ${response.json()}
@@ -126,19 +122,19 @@ TC10 - Listagem de usuário com sucesso
     Dictionary Should Contain Key    ${firstUser}    accessProfile
     Dictionary Should Contain Key    ${firstUser}    cpf
 
-TC11 - Listagem de usuário com token inválido
+TC10 - Listagem de usuário com token inválido
     [Documentation]     Validar acesso negado à listagem de usuários com token inválido
     ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_INVALID}   expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC12 - Listagem de usuário com token em branco
+TC11 - Listagem de usuário com token em branco
     [Documentation]     Validar acesso negado à listagem de usuários com token em branco
     ${response}=   GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}    expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC13- Listagem de usuário por id com sucesso
+TC12- Listagem de usuário por id com sucesso
     [Documentation]    Realizar a busca de um usuário pelo seu id
 
     ${response}      Cadastro usuário com sucesso
@@ -151,27 +147,27 @@ TC13- Listagem de usuário por id com sucesso
     Dictionary Should Contain Key    ${userList}    mail
     Dictionary Should Contain Key    ${userList}    cpf
 
-TC14- Listagem de usuário por id com id inválido
+TC13- Listagem de usuário por id com id inválido
     [Documentation]     Validar acesso negado à listagem de usuários por id com um id inválido
     ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}   expected_status=any
     Status Should Be    404
     Should Be Equal As Strings   ${response.json()["alert"][0]}    Esse usuário não existe em nossa base de dados.
 
-TC15- Listagem de usuário por id com token em branco
+TC14- Listagem de usuário por id com token em branco
     [Documentation]     Validar acesso negado à listagem de usuários por id com o token em branco
     ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}   expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
    
-TC16 - Contagem de usuário com sucesso
+TC15 - Contagem de usuário com sucesso
     [Documentation]    Realizar a contagem de todos os usuários cadastrados
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${response}    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}/?token=${TOKEN_USER}
     Status Should Be    200    ${response}
     # Validar conteúdo da resposta
     Dictionary Should Contain Key   ${response.json()}    count
 
-TC17 - Contagem de usuários com o token inválido
+TC16 - Contagem de usuários com o token inválido
     [Documentation]     Validar acesso negado à contagem usuários com o token inválido
     ${response}=    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}?token=${TOKEN_INVALID}   expected_status=any
     Status Should Be    403
@@ -180,22 +176,23 @@ TC17 - Contagem de usuários com o token inválido
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
    
 
-TC18 - Contagem de usuário token em branco
+TC17 - Contagem de usuário token em branco
     [Documentation]     Validar acesso negado à contagem usuários com o token em branco
     ${response}=    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}?token=${TOKEN_BLANK}   expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC19 - Atualização de cadastro com sucesso
+TC18 - Atualização de cadastro com sucesso
     [Documentation]    Atualizar dados básicos do usuário - e-mail
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}    Get Fake User
     ${response}    Cadastro usuário com sucesso
     ${userId}    Set Variable    ${response.json()["user"]["_id"]}
     ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
     ${body}    Create Dictionary    fullName=${response.json()["user"]["fullName"]}    mail=${person}[email]
     ${response}    PUT On Session    alias=quality-eagles    url=${USER.url}${USER.endpoint}/${user_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
-    #Should Be Equal As Strings    ${response.status_code}    200
+   
+    Status Should Be    200
     Should Be Equal    ${response.json()["msg"]}    Dados atualizados com sucesso!
 
    # Validar campos atualizados
@@ -207,27 +204,29 @@ TC19 - Atualização de cadastro com sucesso
     Log To Console    Novo email: ${updated_user["mail"]}
    
 
-TC20 - Atualização de cadastro sem nome completo
+TC19 - Atualização de cadastro sem nome completo
     [Documentation]     Validar acesso negado à atualização de cadastro sem informar nome completo
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}    Get Fake User
     ${response}     Atualização manual de cadastro usuário
-    ...    fullName=Isabella 
-    ...    mail=isabelaoliveira_0037fbf4-241a-4852-bdf1-19723cb0aab3@qacoders.com.br
-    Status Should Be    400    ${response}
+    ...    fullName=${INCOMPLETE_NAME}
+    ...    mail=${person}[email]
+    Status Should Be    400   
     Should Be Equal    ${response.json()["error"][0]}    Informe o nome e sobrenome com as iniciais em letra maiúscula e sem caracteres especiais.
 
-TC21 - Atualização de cadastro sem email
+TC20 - Atualização de cadastro sem email
     [Documentation]     Validar acesso negado à atualização de cadastro sem informar o e-mail
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}    Get Fake User
     ${response}     Atualização manual de cadastro usuário
-    ...    fullName=Isabella Oliveira
+    ...    fullName=${person}[name]
     ...    mail=
-    Status Should Be    400    ${response}
+    Status Should Be    400    
     Should Be Equal    ${response.json()["error"][1]}    O e-mail informado é inválido. Informe um e-mail no formato [nome@domínio.com].
 
-TC22 - Atualização de senha por id com sucesso
+TC21 - Atualização de senha por id com sucesso
     [Documentation]    Atualizar senha do usuário utilizando seu id
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
     ${response}      Cadastro usuário com sucesso
     ${user_id}       Set Variable    ${response.json()["user"]["_id"]}
@@ -237,8 +236,9 @@ TC22 - Atualização de senha por id com sucesso
     Status Should Be    200
     Should Be Equal    ${response.json()["msg"]}    Senha atualizada com sucesso!
 
-TC23 - Atualização de senha por id com id inválido
+TC22 - Atualização de senha por id com id inválido
     [Documentation]     Validar acesso negado à atualização de senha com id inválido
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${body}    Create Dictionary    password=9qJNsMDL75#A    confirmPassword=9qJNsMDL75#A
     ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}    expected_status=any   
     Status Should Be    400
@@ -246,14 +246,15 @@ TC23 - Atualização de senha por id com id inválido
 
 TC24 - Atualização de senha por id com token em branco
     [Documentation]     Validar acesso negado à atualização de senha informando um token em branco
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${body}    Create Dictionary    password=9qJNsMDL75#A    confirmPassword=9qJNsMDL75#A
     ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}    expected_status=any   
     Status Should Be    403
     Should Be Equal    ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC25 -Atualização de status por id para false com sucesso
+TC23 -Atualização de status por id para false com sucesso
     [Documentation]    Atualizar o status para false utilizando o id do usuário
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
     ${response}      Cadastro usuário com sucesso
     ${userId}       Set Variable    ${response.json()["user"]["_id"]}
@@ -261,9 +262,9 @@ TC25 -Atualização de status por id para false com sucesso
     Status Should Be    200
     Should Be Equal    ${resposta['msg']}    Status do usuario atualizado com sucesso para status false.
 
-TC34 - Atualização de status por id para true com sucesso
+TC24 - Atualização de status por id para true com sucesso
     [Documentation]    Atualizar o status para true utilizando o id do usuário
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
     ${response}      Cadastro usuário com sucesso
     ${userId}       Set Variable    ${response.json()["user"]["_id"]}
@@ -271,8 +272,9 @@ TC34 - Atualização de status por id para true com sucesso
     Status Should Be    200
     Should Be Equal    ${response['msg']}    Status do usuario atualizado com sucesso para status true.
 
-TC35 - Atualização de status por id com id inválido
+TC25 - Atualização de status por id com id inválido
     [Documentation]     Validar acesso negado à atualizção de status com ID inválido
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${headers}     Create Dictionary
     ...     accept=application/json
     ...     Content-Type=application/json
@@ -287,8 +289,9 @@ TC35 - Atualização de status por id com id inválido
     # Verifica o status code
     Status Should Be     404
    
-TC36 - Atualização de status por id com token em branco
+TC26 - Atualização de status por id com token em branco
     [Documentation]     Validar acesso negado à atualização de status com o token em branco
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${headers}     Create Dictionary
     ...     accept=application/json
     ...     Content-Type=application/json

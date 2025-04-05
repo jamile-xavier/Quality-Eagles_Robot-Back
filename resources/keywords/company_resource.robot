@@ -47,7 +47,14 @@ Cadastro Empresa Sucesso
     ${companyFake}        Get Fake Company
     ${idCompany}       Criar Empresa     ${companyFake}    ${TOKEN_USER}
 
-    RETURN           ${idCompany}
+    RETURN           ${idCompany}    
+
+Realizar Login e cadastrar empresa
+    [Documentation]    Realiza o login como usuário e cadastra empresa
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${companyFake}    Get Fake Company
+    ${response}    Cadastro Empresa Sucesso
+    ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}    
 Criar empresa manual
     [Documentation]    Keyword para criar uma empresa com os dados manuais
     [Arguments]
@@ -102,9 +109,7 @@ Listar empresa por id
     ${response}    GET On Session    alias=quality-eagles    url=${url}
     RETURN         ${response}
 
- 
-
-Atualizar status da empresa
+ Atualizar status da empresa
     [Documentation]    Keyword para atualizar o status da empresa
     [Arguments]    ${status}
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
