@@ -14,39 +14,79 @@ Library    String
 *** Test Cases ***
 TC01 - Cadastrar empresa
     [Documentation]    Realizar o cadastro de uma empresa
-    ${response}    Cadastro Empresa Sucesso
-    Status Should Be    201    ${response}
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${companyFake}        Get Fake Company
+    ${responseCompany}       Criar Empresa     ${companyFake}    ${TOKEN_USER}
+    Status Should Be    201    ${responseCompany}
+    Log To Console     ${responseCompany.json()}
+      
+    ${companyData}    Set Variable    ${responseCompany.json()["newCompany"]}
+    Should Be True    isinstance(${companyData}, dict)
+    Dictionary Should Contain Item    ${companyData}    corporateName    ${companyFake}[corporateName]
+    Dictionary Should Contain Item    ${companyData}    registerCompany    ${companyFake}[cnpj]
+    Dictionary Should Contain Item    ${companyData}    mail    ${companyFake}[corporateEmail]
+    
   
 TC02 - Cadastrar empresa em duplicidade    
     [Documentation]     Validar acesso negado à cadastro de empresa em duplicidade
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
-    ${response}     Criar empresa manual     
-    ...    corporateName=Teste do New Company
-    ...    registerCompany=12126456000156
-    ...    mail=test@newtest.com
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${responseCompany}     Criar empresa manual     
+    ...    corporateName=${CORPORATE_NAME_DUPLICATE}
+    ...    registerCompany=${REGISTER_COMPANY_DUPLICATE}
+    ...    mail=${MAIL_COMPANY_DUPLICATE}
+    ...    responsibleContact=${RESPONSIBLE_CONTACT_DUPLICATE}
+    ...    phone=${PHONE_COMPANY_DUPLICATE}
+    ...    serviceDescription=${SERVICE_DESCRIPTION_DUPLICATE}
+    ...    zipCode=${ZIP_CODE_COMPANY_DUPLICATE}
+    ...    city=${CITY_COMPANY_DUPLICATE}
+    ...    state=${STATE_COMPANY_DUPLICATE}
+    ...    district=${DISTRICT_COMPANY_DUPLICATE}
+    ...    street=${STREET_COMPANY_DUPLICATE}
+    ...    number=${NUMBER_COMPANY_DUPLICATE}
     ...    token=${TOKEN_USER}
     
-    Status Should Be    400    ${response}
-    Should Be Equal    ${response.json()['alert'][0]}    Essa companhia já está cadastrada. Verifique o nome, CNPJ e a razão social da companhia.
+    Status Should Be    400    ${responseCompany}
+    Should Be Equal    ${responseCompany.json()['alert'][0]}    Essa companhia já está cadastrada. Verifique o nome, CNPJ e a razão social da companhia.
 
 TC03 - Cadastrar empresa sem nome da empresa
     [Documentation]     Validar acesso negado à cadastro de empresa sem informar o nome
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
-    ${response}     Criar empresa manual    ${TOKEN_USER}
-    ...    corporateName=
-    ...    registerCompany=12126456000156
-    ...    mail=test@newtest.com
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${companyFake}        Get Fake Company
+    ${responseCompany}     Criar empresa manual    ${TOKEN_USER}
+    ...    corporateName= 
+    ...    registerCompany=${REGISTER_COMPANY}
+    ...    mail=${MAIL_COMPANY}
+    ...    responsibleContact=${RESPONSIBLE_CONTACT}
+    ...    phone=${PHONE_COMPANY}
+    ...    serviceDescription=${SERVICE_DESCRIPTION}
+    ...    zipCode=${ZIP_CODE_COMPANY}
+    ...    city=${CITY_COMPANY}
+    ...    state=${STATE_COMPANY}
+    ...    district=${DISTRICT_COMPANY}
+    ...    street=${STREET_COMPANY}
+    ...    number=${NUMBER_COMPANY}
     ...    token=${TOKEN_USER}
 
-    Status Should Be    400    ${response}
-    Should Be Equal    ${response.json()['error'][0]}    O campo 'Nome da empresa' da empresa é obrigatório
+    Status Should Be    400    ${responseCompany}
+    Should Be Equal    ${responseCompany.json()['error'][0]}    O campo 'Nome da empresa' da empresa é obrigatório
 
 TC04 - Cadastrar empresa sem o CNPJ
     [Documentation]     Validar acesso negado à cadastro de empresa sem informar o cnpj
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${companyFake}        Get Fake Company
     ${response}     Criar empresa manual
-    ...    corporateName=Teste do New Company
+    ...    corporateName=${CORPORATE_NAME}
     ...    registerCompany=
-    ...    mail=test@newtest.com
+    ...    mail=${MAIL_COMPANY}
+    ...    responsibleContact=${RESPONSIBLE_CONTACT}
+    ...    phone=${PHONE_COMPANY}
+    ...    serviceDescription=${SERVICE_DESCRIPTION}
+    ...    zipCode=${ZIP_CODE_COMPANY}
+    ...    city=${CITY_COMPANY}
+    ...    state=${STATE_COMPANY}
+    ...    district=${DISTRICT_COMPANY}
+    ...    street=${STREET_COMPANY}
+    ...    number=${NUMBER_COMPANY}
     ...    token=${TOKEN_USER}
 
     Status Should Be    400    ${response}
@@ -54,22 +94,33 @@ TC04 - Cadastrar empresa sem o CNPJ
 
 TC05 - Cadastrar empresa sem email
     [Documentation]     Validar acesso negado à cadastro de empresa sem informar o e-mail
-    ${response}     Criar empresa manual
-    ...    corporateName=Teste do New Company
-    ...    registerCompany=12126456000156
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${companyFake}        Get Fake Company
+    ${responseCompany}     Criar empresa manual
+    ...    corporateName=${CORPORATE_NAME}
+    ...    registerCompany=${REGISTER_COMPANY}
     ...    mail=
+    ...    responsibleContact=${RESPONSIBLE_CONTACT}
+    ...    phone=${PHONE_COMPANY}
+    ...    serviceDescription=${SERVICE_DESCRIPTION}
+    ...    zipCode=${ZIP_CODE_COMPANY}
+    ...    city=${CITY_COMPANY}
+    ...    state=${STATE_COMPANY}
+    ...    district=${DISTRICT_COMPANY}
+    ...    street=${STREET_COMPANY}
+    ...    number=${NUMBER_COMPANY}
     ...    token=${TOKEN_USER}
 
-    Status Should Be    400    ${response}
-    Should Be Equal    ${response.json()['error'][0]}    O campo 'Email' é obrigatório.
+    Status Should Be    400    ${responseCompany}
+    Should Be Equal    ${responseCompany.json()['error'][0]}    O campo 'Email' é obrigatório.
 
 TC06 - Exclusão de empresa com sucesso
     [Documentation]    Deletar uma empresa existente
     ${response}    Cadastro Empresa Sucesso       
-    ${company_id}       Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${companyId}       Set Variable    ${response.json()["newCompany"]["_id"]}
 
     # Deletar usuário
-    ${response}      Deletar empresa    ${company_id}
+    ${response}      Deletar empresa    ${companyId}
 
     # Validações
     Status Should Be    200    
@@ -78,7 +129,7 @@ TC06 - Exclusão de empresa com sucesso
 TC07 - Exclusão de empresa com id inválido
     [Documentation]     Validar acesso negado à exclusão de empresa informando um id inválido
     ${response}=    DELETE On Session    alias=quality-eagles    url=/${COMPANY}/${INVALID_COMPANY_ID}?token=${TOKEN_USER}   expected_status=any
-    #Status Should Be    404   ${response}
+    Status Should Be    404   ${response}
     #Should Be Equal As Strings   ${response.json()["msg"]}    Essa companhia não existem em nossa base de dados.
 
 TC08 - Exclusão de empresa com token inválido
@@ -89,23 +140,23 @@ TC08 - Exclusão de empresa com token inválido
 
 TC09 - Listagem de empresa com sucesso
     [Documentation]    Listar todas as empresas cadastradas
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
-    ${response}    GET On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/?token=${TOKEN_USER}
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}   200
+    ${responseCompany}    GET On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/?token=${TOKEN_USER}
     Status Should Be    200    ${response}
 
    # Validar estrutura da resposta
-    Should Be True    isinstance(${response.json()}, list)
-    Should Not Be Empty    ${response.json()}
+    Should Be True    isinstance(${responseCompany.json()}, list)
+    Should Not Be Empty    ${responseCompany.json()}
 
     # Validar primeiro usuário da lista
-    ${first_company}    Set Variable    ${response.json()[0]}
+    ${firstCompany}    Set Variable    ${responseCompany.json()[0]}
 
     # Validar campos obrigatórios
-    Dictionary Should Contain Key    ${first_company}    corporateName
-    Dictionary Should Contain Key    ${first_company}    registerCompany
-    Dictionary Should Contain Key    ${first_company}    responsibleContact
-    Dictionary Should Contain Key    ${first_company}    mail
-    Dictionary Should Contain Key    ${first_company}    telephone
+    Dictionary Should Contain Key    ${firstCompany}    corporateName
+    Dictionary Should Contain Key    ${firstCompany}    registerCompany
+    Dictionary Should Contain Key    ${firstCompany}    responsibleContact
+    Dictionary Should Contain Key    ${firstCompany}    mail
+    Dictionary Should Contain Key    ${firstCompany}    telephone
 
 TC10 - Listagem de empresa com token inválido
     [Documentation]     Validar acesso negado à listagem de empresa por id com um token inválido
@@ -121,11 +172,11 @@ TC11 - Listagem de empresa com token em branco
 
 TC12 - Contagem de empresa com sucesso
     [Documentation]    Realizar a contagem de todas as empresas cadastradas
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
-    ${response}    GET On Session    alias=quality-eagles    url=/${COMPANY_COUNT.url}${COMPANY_COUNT.endpoint}/?token=${TOKEN_USER}
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${responseCompany}    GET On Session    alias=quality-eagles    url=/${COMPANY_COUNT.url}${COMPANY_COUNT.endpoint}/?token=${TOKEN_USER}
     Status Should Be    200    ${response}
     # Validar conteúdo da resposta
-    Dictionary Should Contain Key   ${response.json()}    count
+    Dictionary Should Contain Key   ${responseCompany.json()}    count
 
 TC13 - Contagem de empresa com token inválido
     [Documentation]     Validar acesso negado à contagem de empresa com o token inválido
@@ -145,25 +196,25 @@ TC14 - Contagem de empresa com token em branco
 
 TC15 - Atualização de cadastro da empresa por id com sucesso
     [Documentation]    Atualizar dados básicos da empresa - Responsável
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${company_fake}    Get Fake Company
     ${response}    Cadastro Empresa Sucesso
-    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}
     ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
     ${body}    Create Dictionary    corporateName=${response.json()["newCompany"]["corporateName"]}    registerCompany=${response.json()["newCompany"]["registerCompany"]}     mail=${response.json()["newCompany"]["mail"]}     matriz=Teste    responsibleContact= Marcio Freitas    telephone=${response.json()["newCompany"]["telephone"]}    serviceDescription=Teste 
     ${response}    PUT On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/${company_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
     Should Be Equal As Strings    ${response.status_code}    200
     Should Be Equal    ${response.json()["msg"]}    Companhia atualizada com sucesso.
     # Validar campos atualizados
-    ${updated_company}    Set Variable    ${response.json()["updatedCompany"]}
-    Dictionary Should Contain Key    ${updated_company}    responsibleContact
+    ${updatedCompany}    Set Variable    ${response.json()["updatedCompany"]}
+    Dictionary Should Contain Key    ${updatedCompany}    responsibleContact
 
     # Remover espaços extras e comparar
-    ${expected_contact}    Strip String    Marcio Freitas
-    ${actual_contact}      Strip String    ${updated_company["responsibleContact"]}
-    Should Be Equal    ${expected_contact}    ${actual_contact}
+    ${expectedContact}    Strip String    Marcio Freitas
+    ${actualContact}      Strip String    ${updatedCompany["responsibleContact"]}
+    Should Be Equal    ${expectedContact}    ${actualContact}
 
-    Log To Console    Responsável atualizado: ${updated_company["responsibleContact"]}
+    Log To Console    Responsável atualizado: ${updatedCompany["responsibleContact"]}
     Log To Console    Dados da empresa atualizada: ${response.json()}
 
 TC16 - Atualização de cadastro da empresa por id com token inválido
@@ -209,31 +260,8 @@ TC19 - Atualização de cadastro da empresa por id com o e-mail em branco
 
 TC21 - Atualização de endereço da empresa com sucesso
     [Documentation]    Atualizar o endereço da empresa
-    ${company_fake}    Get Fake Company
-    ${response}    Cadastro Empresa Sucesso
-    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
-    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
-    ${address}=    Create List
-    ${address_item}=    Create Dictionary
-    ...    zipCode=90906874
-    ...    city=Vilhena
-    ...    state=SP
-    ...    district=Sossego
-    ...    street=Alameda Getúlio Vargas
-    ...    number=727
-    ...    complement=de 4500 ao fim - lado par
-    ...    country=Brasil
-    Append To List    ${address}    ${address_item}
-    ${body}=    Create Dictionary
-    ...    corporateName=${response.json()["newCompany"]["corporateName"]}
-    ...    registerCompany=${response.json()["newCompany"]["registerCompany"]}
-    ...    mail=${response.json()["newCompany"]["mail"]}
-    ...    matriz=Teste
-    ...    responsibleContact=${response.json()["newCompany"]["responsibleContact"]}
-    ...    telephone=${response.json()["newCompany"]["telephone"]}
-    ...    serviceDescription=${response.json()["newCompany"]["serviceDescription"]}
-    ...    address=${address}
-    ${response}    PUT On Session    alias=quality-eagles    url=/${COMPANY_ADDRESS.url}${COMPANY_ADDRESS.endpoint}/${company_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+    ${response}    Atualizar endereço da empresa
+   
     Should Be Equal As Strings    ${response.status_code}    200
     Should Be Equal    ${response.json()["msg"]}    Endereço da companhia atualizado com sucesso.
     
@@ -242,19 +270,16 @@ TC21 - Atualização de endereço da empresa com sucesso
 
 TC22 -Atualização de status por id para false com sucesso
     [Documentation]    Atualizar o status para false utilizando o id do usuário
-    ${company_fake}    Get Fake Company
-    ${response}    Cadastro Empresa Sucesso
-    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
-    ${response}      Atualizar status da empresa    company_id=${company_id}    status=false
+    ${response}      Atualizar status da empresa     status=false
     #Status Should Be    200
     Should Be Equal    ${response['msg']}    Status da companhia atualizado com sucesso.
 
 TC23 - Atualização de status por id para true com sucesso
     [Documentation]    Atualizar o status para true utilizando o id do usuário
-    ${company_fake}    Get Fake Company
+    ${companyFake}    Get Fake Company
     ${response}    Cadastro Empresa Sucesso
-    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
-    ${response}      Atualizar status da empresa   company_id=${company_id}    status=true
+    ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${response}      Atualizar status da empresa   companyId=${companyId}    status=true
     #Status Should Be    200
     Should Be Equal    ${response['msg']}    Status da companhia atualizado com sucesso.
    

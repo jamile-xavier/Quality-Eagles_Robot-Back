@@ -5,8 +5,8 @@ Resource    ../pages/user_variables.robot
 Library    ../../libs/get_fake_user.py
 
 *** Keywords ***
-Criar usuario
-    [Documentation]    Criar um usuário com dados aleatórios
+Criar usuário
+    [Documentation]    Keyword para criar um usuário com dados aleatórios
     [Arguments]    ${person}    ${token}
     ${headers}     Create Dictionary
                     ...    accept=application/json
@@ -30,13 +30,14 @@ Criar usuario
     RETURN           ${response}
 
 Cadastro usuário com sucesso
+    [Documentation]    Keyword para realizar cadastro de usuário
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    expected_status=200
     ${user}        Get Fake User
-    ${id_user}       Criar Usuario     ${user}    ${TOKEN_USER}
+    ${idUser}       Criar Usuário     ${user}    ${TOKEN_USER}
 
-    RETURN           ${id_user}
-Cadastro manual de usuario
-    [Documentation]    Criar um usuário com dados manuais
+    RETURN           ${idUser}
+Cadastro manual de usuário
+    [Documentation]    Keyword para criar um usuário com dados manuais
     [Arguments]    ${name}    ${mail}    ${cpf}    ${password}    ${confirmPassword}
     ${body}        Create Dictionary
                     ...    fullName= ${name}
@@ -56,8 +57,8 @@ Cadastro manual de usuario
 
     RETURN           ${response}
 
-Atualização manual de cadastro usuario
-    [Documentation]    Criar um usuário com dados manuais
+Atualização manual de cadastro usuário
+    [Documentation]    Keyword para atualizar um usuário com dados manuais
     [Arguments]    ${name}    ${mail}   
     ${body}        Create Dictionary
                     ...    fullName= ${name}
@@ -71,44 +72,48 @@ Atualização manual de cadastro usuario
 
     RETURN           ${response}    
 
-Listar usuario por id
-    [Arguments]    ${id}
-    ${url}         Set Variable    /${USER.url}${USER.endpoint}/${id}/?token=${TOKEN_USER}
+Listar usuário por id
+    [Documentation]    Keyword para listar usuários por id
+    [Arguments]    ${userId}
+    ${url}         Set Variable    /${USER.url}${USER.endpoint}/${userId}/?token=${TOKEN_USER}
     ${response}    GET On Session    alias=quality-eagles    url=${url}
     RETURN         ${response}
 
-Atualizar status de usuario
-    [Arguments]    ${user_id}    ${status}
+Atualizar status de usuário
+    [Documentation]    Keyword para atualizar status de usuário
+    [Arguments]    ${userId}    ${status}
     ${headers}     Create Dictionary
                     ...    accept=application/json
                     ...    Content-Type=application/json
     ${body}        Create Dictionary    status=${status}
     ${response}    PUT On Session
                      ...    alias=quality-eagles
-                     ...    url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${user_id}?token=${TOKEN_USER}
+                     ...    url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${userId}?token=${TOKEN_USER}
                      ...    json=${body}
                      ...    headers=${headers}
     RETURN         ${response.json()}
 
-Atualizar senha de usuario
-    [Arguments]    ${user_id}    ${password}    ${confirmPassword}
+Atualizar senha de usuário
+    [Documentation]    Keyword para atualizar senha de usuário
+    [Arguments]    ${userId}    ${password}    ${confirmPassword}
     ${body}    Create Dictionary    password=${password}    confirmPassword=${confirmPassword}
     ${headers}    Create Dictionary
     ...    accept=application/json
     ...    Content-Type=application/json
 
-    ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}${user_id}?token=${TOKEN_USER}   json=${body}    headers=${headers}
+    ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}${userId}?token=${TOKEN_USER}   json=${body}    headers=${headers}
 
 
-Deletar usuario
-    [Arguments]    ${user_id}
+Deletar usuário
+    [Documentation]    Keyword para exclusão de usuário
+    [Arguments]    ${userId}
     ${headers}     Create Dictionary
                     ...    accept=application/json
                     ...    Content-Type=application/json
 
     ${response}    DELETE On Session
                      ...    alias=quality-eagles
-                     ...    url=/${USER.url}${USER.endpoint}/${user_id}?token=${TOKEN_USER}
+                     ...    url=/${USER.url}${USER.endpoint}/${userId}?token=${TOKEN_USER}
                      ...    headers=${headers}
 
     RETURN         ${response.json()}
