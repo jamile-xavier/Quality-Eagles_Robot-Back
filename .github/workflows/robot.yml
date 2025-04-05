@@ -21,6 +21,7 @@ jobs:
           pip install robotframework
           pip install robotframework-requests
           pip install Faker
+          pip install pyyaml
 
       - name: Executando os testes de API do Robot
         run: |
