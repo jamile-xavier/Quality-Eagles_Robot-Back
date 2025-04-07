@@ -10,14 +10,12 @@ Library    Collections
 *** Test Cases ***
 TC01 - Cadastro de usuário com sucesso
     [Documentation]    Realizar um cadastro de usuário com sucesso
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${person}        Get Fake User
-    ${response}      Criar usuário    ${person}    ${TOKEN_USER}
+    ${responseUser}    ${person}     Realizar login e cadastrar usuário retornando dados fake    
 
     Status Should Be  201
 
     #Validar campos
-    ${userData}    Set Variable    ${response.json()["user"]}
+    ${userData}    Set Variable    ${responseUser.json()["user"]}
     Should Be True    isinstance(${userData}, dict)
     Dictionary Should Contain Item    ${userData}    fullName    ${person}[name]
     Dictionary Should Contain Item    ${userData}    mail    ${person}[email]
@@ -104,7 +102,7 @@ TC08 - Exclusão de usuário com token em branco
 
 TC09 - Listagem de usuário com sucesso
     [Documentation]    Listar todos os usuários cadastrados
-    ${response}    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/?token=${TOKEN_USER}
+    ${response}    Listar usuário com sucesso
     Status Should Be    200   
 
    # Validar estrutura da resposta
@@ -136,11 +134,10 @@ TC11 - Listagem de usuário com token em branco
 
 TC12- Listagem de usuário por id com sucesso
     [Documentation]    Realizar a busca de um usuário pelo seu id
+    ${response}    ${userId}      Listar usuário por id   
 
-    ${response}      Cadastro usuário com sucesso
-    ${userId}       Set Variable    ${response.json()["user"]["_id"]}
-    ${response}      Listar usuário por id    ${userId}
     Should Be Equal As Strings    ${response.status_code}    200
+
     ${userList}    Set Variable    ${response.json()}
     Should Be True    isinstance(${userList}, dict)
     Dictionary Should Contain Key    ${userList}    fullName
@@ -184,13 +181,7 @@ TC17 - Contagem de usuário token em branco
 
 TC18 - Atualização de cadastro com sucesso
     [Documentation]    Atualizar dados básicos do usuário - e-mail
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${person}    Get Fake User
-    ${response}    Cadastro usuário com sucesso
-    ${userId}    Set Variable    ${response.json()["user"]["_id"]}
-    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
-    ${body}    Create Dictionary    fullName=${response.json()["user"]["fullName"]}    mail=${person}[email]
-    ${response}    PUT On Session    alias=quality-eagles    url=${USER.url}${USER.endpoint}/${user_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+    ${response}     ${person}    Atualizar cadastro de usuário com sucesso
    
     Status Should Be    200
     Should Be Equal    ${response.json()["msg"]}    Dados atualizados com sucesso!
@@ -226,20 +217,18 @@ TC20 - Atualização de cadastro sem email
 
 TC21 - Atualização de senha por id com sucesso
     [Documentation]    Atualizar senha do usuário utilizando seu id
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${person}        Get Fake User
-    ${response}      Cadastro usuário com sucesso
-    ${user_id}       Set Variable    ${response.json()["user"]["_id"]}
-    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
-    ${body}    Create Dictionary    password=9qJNsMDL75#A    confirmPassword=9qJNsMDL75#A
-    ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${user_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+    ${person}    Get Fake User
+    ${response}   Atualizar senha de usuário    
     Status Should Be    200
     Should Be Equal    ${response.json()["msg"]}    Senha atualizada com sucesso!
-
+    
+    Log To Console    ${person}[password] 
+    
 TC22 - Atualização de senha por id com id inválido
     [Documentation]     Validar acesso negado à atualização de senha com id inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${body}    Create Dictionary    password=9qJNsMDL75#A    confirmPassword=9qJNsMDL75#A
+    ${person}        Get Fake User
+    ${body}    Create Dictionary    password=${person}[password]    confirmPassword=${person}[password] 
     ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}    expected_status=any   
     Status Should Be    400
     Should Be Equal    ${response.json()["msg"]}    Esse usuário não existe em nossa base de dados.
@@ -247,28 +236,20 @@ TC22 - Atualização de senha por id com id inválido
 TC24 - Atualização de senha por id com token em branco
     [Documentation]     Validar acesso negado à atualização de senha informando um token em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${body}    Create Dictionary    password=9qJNsMDL75#A    confirmPassword=9qJNsMDL75#A
+    ${person}        Get Fake User
+    ${body}    Create Dictionary    password=${person}[password]    confirmPassword=${person}[password] 
     ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}    expected_status=any   
     Status Should Be    403
     Should Be Equal    ${response.json()["errors"][0]}    Failed to authenticate token.
 
 TC23 -Atualização de status por id para false com sucesso
     [Documentation]    Atualizar o status para false utilizando o id do usuário
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${person}        Get Fake User
-    ${response}      Cadastro usuário com sucesso
-    ${userId}       Set Variable    ${response.json()["user"]["_id"]}
-    ${resposta}      Atualizar status de usuário    userId=${userId}    status=false
+    ${response}      Atualizar status de usuário    status=false
     Status Should Be    200
-    Should Be Equal    ${resposta['msg']}    Status do usuario atualizado com sucesso para status false.
-
+    Should Be Equal    ${response['msg']}    Status do usuario atualizado com sucesso para status false.
 TC24 - Atualização de status por id para true com sucesso
     [Documentation]    Atualizar o status para true utilizando o id do usuário
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${person}        Get Fake User
-    ${response}      Cadastro usuário com sucesso
-    ${userId}       Set Variable    ${response.json()["user"]["_id"]}
-    ${response}      Atualizar status de usuário    userId=${userId}    status=true
+    ${response}      Atualizar status de usuário       status=true
     Status Should Be    200
     Should Be Equal    ${response['msg']}    Status do usuario atualizado com sucesso para status true.
 

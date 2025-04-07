@@ -45,16 +45,18 @@ Cadastro Empresa Sucesso
     [Documentation]    Keyword para cadastrar uma empresa com sucesso
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${companyFake}        Get Fake Company
-    ${idCompany}       Criar Empresa     ${companyFake}    ${TOKEN_USER}
+    ${responseCompany}       Criar Empresa     ${companyFake}    ${TOKEN_USER}
 
-    RETURN           ${idCompany}    
+    RETURN           ${responseCompany}   
 
-Realizar Login e cadastrar empresa
+Realizar Login e cadastrar empresa retornando dados fake
     [Documentation]    Realiza o login como usuário e cadastra empresa
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${companyFake}    Get Fake Company
-    ${response}    Cadastro Empresa Sucesso
-    ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}    
+    ${companyFake}        Get Fake Company
+    ${responseCompany}       Criar Empresa     ${companyFake}    ${TOKEN_USER}
+    [Return]    ${responseCompany}  ${companyFake}         
+
+    
 Criar empresa manual
     [Documentation]    Keyword para criar uma empresa com os dados manuais
     [Arguments]
@@ -102,6 +104,13 @@ Criar empresa manual
     ...   expected_status=any
     
     RETURN    ${response}
+
+Listar empresa com sucesso
+    [Documentation]    Keyword para listar empresas com sucesso
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}   200
+    ${responseCompany}    GET On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/?token=${TOKEN_USER}
+    [Return]    ${responseCompany}
+
 Listar empresa por id
     [Documentation]    Keyword para listar empresa por id
     [Arguments]    ${id}
@@ -109,6 +118,55 @@ Listar empresa por id
     ${response}    GET On Session    alias=quality-eagles    url=${url}
     RETURN         ${response}
 
+Contagem de empresa com sucesso
+    [Documentation]    Keyword para realizar contagem de empresas com sucesso
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${responseCompany}    GET On Session    alias=quality-eagles    url=/${COMPANY_COUNT.url}${COMPANY_COUNT.endpoint}/?token=${TOKEN_USER}
+    [Return]    ${responseCompany}
+
+Atualizar cadastro empresa por id
+    [Documentation]    Keyword para atualizar o cadastro da empresa por id
+    ${response}    Cadastro Empresa Sucesso
+    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
+    ${body}    Create Dictionary    
+    ...    corporateName=${response.json()["newCompany"]["corporateName"]}
+    ...    registerCompany=${response.json()["newCompany"]["registerCompany"]} 
+    ...    mail=${response.json()["newCompany"]["mail"]} 
+    ...    matriz=${response.json()["newCompany"]["matriz"]} 
+    ...    responsibleContact= ${RESPONSIBLE_CONTACT}
+    ...    telephone=${response.json()["newCompany"]["telephone"]}
+    ...    serviceDescription=${response.json()["newCompany"]["serviceDescription"]}
+    ${responseCompany}    PUT On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/${company_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+    [Return]    ${responseCompany}
+
+Atualizar endereço da empresa
+    [Documentation]    Keyword para realizar atualização de endereço da empresa
+    ${responseCompany}    ${companyFake}     Realizar Login e cadastrar empresa retornando dados fake    
+    ${companyId}    Set Variable    ${responseCompany.json()["newCompany"]["_id"]}
+    ${headers}    Create Dictionary    accept=application/json    Content-Type=application/json
+    ${address}=    Create List
+    ${addressItem}=    Create Dictionary
+    ...    zipCode=${companyFake}[zipCode]
+    ...    city=${companyFake}[city]
+    ...    state=${companyFake}[state]
+    ...    district=${companyFake}[neighborhood]
+    ...    street=${companyFake}[street]
+    ...    number=${companyFake}[number]
+    ...    complement=Loja
+    ...    country=Brasil
+    Append To List    ${address}    ${addressItem}
+    ${body}=    Create Dictionary
+    ...    corporateName=${responseCompany.json()["newCompany"]["corporateName"]}
+    ...    registerCompany=${responseCompany.json()["newCompany"]["registerCompany"]}
+    ...    mail=${responseCompany.json()["newCompany"]["mail"]}
+    ...    matriz=${responseCompany.json()["newCompany"]["matriz"]}
+    ...    responsibleContact=${responseCompany.json()["newCompany"]["responsibleContact"]}
+    ...    telephone=${responseCompany.json()["newCompany"]["telephone"]}
+    ...    serviceDescription=${responseCompany.json()["newCompany"]["serviceDescription"]}
+    ...    address=${address}
+    ${response}    PUT On Session    alias=quality-eagles    url=/${COMPANY_ADDRESS.url}${COMPANY_ADDRESS.endpoint}/${company_id}?token=${TOKEN_USER}    json=${body}    headers=${headers}
+    [Return]    ${response}
  Atualizar status da empresa
     [Documentation]    Keyword para atualizar o status da empresa
     [Arguments]    ${status}
