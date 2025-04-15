@@ -3,7 +3,7 @@
 ## Descrição do Projeto
 
 <h2 align="center">
-Teste de Automação de API ERP
+Teste de Automação de API ERP com Robot Framework
 </h2>
 <p align="center"> Realização de testes automação de API do ERP disponibilizado pela Qa Coders para a equipe Quality Eagles T13. </p>
 <p align="center">Testes de endpoints: Login, Users e Company</p>
@@ -15,9 +15,9 @@ Teste de Automação de API ERP
 
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias](#tecnologias)
-- [Pre requisitos](#Pré-requisitos)
 - [Executando o projeto](#Executando-o-projeto)
 - [Autora](#autora)
+- [Equipe](#equipe)
 - [Licença](#licença)
 
 ### Funcionalidades
@@ -41,32 +41,25 @@ Teste de Automação de API ERP
 
 ### Tecnologias
 
+- [VsCode](https://code.visualstudio.com/), ou outra IDE de sua preferência
+- [Python](https://www.python.org/) - Caso não possua instalado será necessário realizar instalação antes de executar o projeto.
 - [Robot](https://robotframework.org/)
+- [RequestsLibrary](https://docs.robotframework.org/docs/different_libraries/requests)
+- [Faker](https://faker.readthedocs.io/en/master/)
+- [PYYAML](https://pypi.org/project/PyYAML/)
 - [Swagger](https://swagger.io/)
 - [Azure](https://azure.microsoft.com/pt-br/)
 
-### Pré-requisitos
-
-Para utilizar o projeto em sua máquina será necessário possuir as seguintes ferramentas:
-[VsCode](https://code.visualstudio.com/) - Ou outra IDE de sua preferência. O passo a passo refere-se a utilização do VsCode.
-
-#### Dependências
-
-[Robot](https://robotframework.org/)
-[RequestsLibrary](https://docs.robotframework.org/docs/different_libraries/requests)
-[Faker](https://faker.readthedocs.io/en/master/)
-[PYYAML](https://pypi.org/project/PyYAML/)
-
-As dependências poderão ser instaladas manualmente ou utilizando o comando disponível em executando o projeto para que todas as dependências listadas no arquivo requeriments.txt sejam instaladas na raiz do projeto.
-
 ### Executando-o-projeto
+
+Passo a passo utilizando o VsCode:
 
 - Realizar o dowload do projeto;
 - Abrir o VsCode;
 - Clicar em File;
 - Open Folder;
 - Selecionar pasta;
-- Abrir o terminal e digitar o comando para instalar as dependências:
+- Abrir o terminal e digitar o comando para instalar as dependências (o comando abaixo realizará a instalação de todas as dependências necessárias):
 
 ```bash
 pip install -r requeriments.txt
@@ -98,10 +91,24 @@ Teste de usuários:
  robot -d log .\resource\tests\user.robot
 ```
 
-# Autora
+### Autora
 
 <p> Jamile Xavier Mendonça </p>
 
 [Github](https://github.com/jamile-xavier)
 
 [Linkedin](https://www.linkedin.com/in/jamile-xavier/)
+
+### Equipe
+
+- Cristian (TechLead)
+- Carol
+- Italo
+- Iza
+- Jamile
+- Lucas
+- Tadeu
+
+### Licença
+
+MIT

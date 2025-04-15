@@ -91,7 +91,7 @@ TC04 - Cadastrar empresa sem o CNPJ
     Status Should Be    400    ${response}
     Should Be Equal    ${response.json()['error'][0]}    O campo 'CNPJ' da empresa é obrigatório.
 
-TC05 - Cadastrar empresa sem email
+TC05 - Cadastrar empresa sem e-mail
     [Documentation]     Validar acesso negado à cadastro de empresa sem informar o e-mail
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${companyFake}        Get Fake Company

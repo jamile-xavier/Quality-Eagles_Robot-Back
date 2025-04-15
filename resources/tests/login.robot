@@ -19,7 +19,6 @@ TC01 - Realizar login com sucesso Admin
 
     Should Not Be Empty     ${response.json()["token"]}
 
-   
 TC02 - Realizar login com sucesso User
     [Documentation]    Realizar login de usuário com sucesso
     ${response}    Realizar login com token user   email=${MAIL_USER}    senha=${PASSWORD_USER}    expectedStatus=200
