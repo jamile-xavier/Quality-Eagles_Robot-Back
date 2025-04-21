@@ -29,7 +29,7 @@ TC01 - Cadastrar empresa
 TC02 - Cadastrar empresa em duplicidade    
     [Documentation]     Validar acesso negado à cadastro de empresa em duplicidade
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${responseCompany}     Criar empresa manual     
+    ${responseCompany}     Criar empresa manual    
     ...    corporateName=${CORPORATE_NAME_DUPLICATE}
     ...    registerCompany=${REGISTER_COMPANY_DUPLICATE}
     ...    mail=${MAIL_COMPANY_DUPLICATE}
@@ -42,8 +42,7 @@ TC02 - Cadastrar empresa em duplicidade
     ...    district=${DISTRICT_COMPANY_DUPLICATE}
     ...    street=${STREET_COMPANY_DUPLICATE}
     ...    number=${NUMBER_COMPANY_DUPLICATE}
-    ...    token=${TOKEN_USER}
-    
+       
     Status Should Be    400    ${responseCompany}
     Should Be Equal    ${responseCompany.json()['alert'][0]}    Essa companhia já está cadastrada. Verifique o nome, CNPJ e a razão social da companhia.
 #
@@ -64,8 +63,7 @@ TC02 - Cadastrar empresa em duplicidade
 #    ...    district=${DISTRICT_COMPANY}
 #    ...    street=${STREET_COMPANY}
 #    ...    number=${NUMBER_COMPANY}
-#    ...    token=${TOKEN_USER}
-#
+#  #
 #    Status Should Be    400    ${responseCompany}
 #    Should Be Equal    ${responseCompany.json()['error'][0]}    O campo 'Nome da empresa' da empresa é obrigatório
 
@@ -86,8 +84,7 @@ TC04 - Cadastrar empresa sem o CNPJ
     ...    district=${DISTRICT_COMPANY}
     ...    street=${STREET_COMPANY}
     ...    number=${NUMBER_COMPANY}
-    ...    token=${TOKEN_USER}
-
+  
     Status Should Be    400    ${response}
     Should Be Equal    ${response.json()['error'][0]}    O campo 'CNPJ' da empresa é obrigatório.
 
@@ -108,7 +105,6 @@ TC05 - Cadastrar empresa sem e-mail
     ...    district=${DISTRICT_COMPANY}
     ...    street=${STREET_COMPANY}
     ...    number=${NUMBER_COMPANY}
-    ...    token=${TOKEN_USER}
 
     Status Should Be    400    ${responseCompany}
     Should Be Equal    ${responseCompany.json()['error'][0]}    O campo 'Email' é obrigatório.
@@ -127,13 +123,23 @@ TC06 - Exclusão de empresa com sucesso
 
 TC07 - Exclusão de empresa com id inválido
     [Documentation]     Validar acesso negado à exclusão de empresa informando um id inválido
-    ${response}=    DELETE On Session    alias=quality-eagles    url=/${COMPANY}/${INVALID_COMPANY_ID}?token=${TOKEN_USER}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}=    DELETE On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}  
+    ...    url=/${COMPANY}/${INVALID_COMPANY_ID}
+    ...  expected_status=any
     Status Should Be    404   ${response}
     #Should Be Equal As Strings   ${response.json()["msg"]}    Essa companhia não existem em nossa base de dados.
 
 TC08 - Exclusão de empresa com token inválido
     [Documentation]     Validar acesso negado à exclusão de empresa informando um token inválido
-    ${response}=    DELETE On Session    alias=quality-eagles    url=/${COMPANY}/${VALID_COMPANY_ID}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    DELETE On Session 
+    ...    alias=quality-eagles
+    ...    headers=${headers} 
+    ...    url=/${COMPANY}/${VALID_COMPANY_ID}
+    ...    expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
@@ -158,13 +164,23 @@ TC09 - Listagem de empresa com sucesso
 
 TC10 - Listagem de empresa com token inválido
     [Documentation]     Validar acesso negado à listagem de empresa por id com um token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${COMPANY}/${VALID_COMPANY_ID}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers} 
+    ...    url=/${COMPANY}/${VALID_COMPANY_ID}
+    ...    expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
 TC11 - Listagem de empresa com token em branco
     [Documentation]     Validar acesso negado à listagem de empresa por id com um token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${COMPANY}/${VALID_COMPANY_ID}?token=${TOKEN_BLANK}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=    GET On Session 
+    ...    alias=quality-eagles 
+    ...    headers=${headers} 
+    ...    url=/${COMPANY}/${VALID_COMPANY_ID}
+    ...    expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.    
 
@@ -177,7 +193,12 @@ TC12 - Contagem de empresa com sucesso
 
 TC13 - Contagem de empresa com token inválido
     [Documentation]     Validar acesso negado à contagem de empresa com o token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${COMPANY_COUNT}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${COMPANY_COUNT}
+    ...    expected_status=any
     Status Should Be    403
     Log    GET Count Users Response: ${response}
     Log To Console    ${response.json()["errors"][0]}
@@ -185,7 +206,12 @@ TC13 - Contagem de empresa com token inválido
 
 TC14 - Contagem de empresa com token em branco
     [Documentation]     Validar acesso negado à contagem usuários com o token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER_COUNT}?token=${TOKEN_BLANK}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER_COUNT}
+    ...    expected_status=any
     Status Should Be    403
     Log    GET Count Users Response: ${response}
     Log To Console    ${response.json()["errors"][0]}
@@ -210,7 +236,12 @@ TC15 - Atualização de cadastro da empresa por id com sucesso
 TC16 - Atualização de cadastro da empresa por id com token inválido
     [Documentation]     Validar acesso negado à atualização de cadastro da empresa por id com um token inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${response}=    PUT On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    PUT On Session 
+    ...    alias=quality-eagles
+    ...    headers=${headers}  
+    ...    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}
+    ...  expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
     
@@ -231,14 +262,24 @@ TC16 - Atualização de cadastro da empresa por id com token inválido
 TC18- Atualização de cadastro da empresa por id com o cnpj em branco
     [Documentation]     Validar acesso negado à atualização de cadastro da empresa por id com o cnpj em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${response}=    PUT On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}?token=${TOKEN_USER}    expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}=    PUT On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}
+    ...    expected_status=any
     Status Should Be    400
     Should Be Equal As Strings   ${response.json()["error"][2]}    O campo 'CNPJ' da empresa é obrigatório.
 
 TC19 - Atualização de cadastro da empresa por id com o e-mail em branco
     [Documentation]     Validar acesso negado à atualização de cadastro da empresa por id com o e-mail em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${response}=    PUT On Session    alias=quality-eagles    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}?token=${TOKEN_USER}    expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}=    PUT On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}
+    ...    expected_status=any
     Status Should Be    400
     Should Be Equal As Strings   ${response.json()["error"][1]}    O campo 'Email' é obrigatório.
 
@@ -297,13 +338,11 @@ TC25 - Atualização de status por id com token em branco
     [Documentation]     Validar acesso negado à atualizção de status da empresa com ID inválido
     ${response}    Cadastro Empresa Sucesso
     ${companyId}    Set Variable    ${response.json()["newCompany"]["_id"]}
-    ${headers}     Create Dictionary
-    ...     accept=application/json
-    ...     Content-Type=application/json
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
     ${body}     Create Dictionary     status=true
     ${responseCompany}     PUT On Session
     ...     alias=quality-eagles
-    ...     url=/${COMPANY_STATUS.url}${COMPANY_STATUS.endpoint}/${VALID_COMPANY_ID}?token=${TOKEN_BLANK}
+    ...     url=/${COMPANY_STATUS.url}${COMPANY_STATUS.endpoint}/${VALID_COMPANY_ID}
     ...     json=${body}
     ...     headers=${headers}
     ...     expected_status=any

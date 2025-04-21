@@ -1,6 +1,7 @@
 *** Settings ***
 Variables      ../../fixtures/environments.yaml
 Resource    ../tests/login.robot
+Resource    ../keywords/login_resource.robot
 Resource    ../pages/user_variables.robot
 Library    ../../libs/get_fake_user.py
 

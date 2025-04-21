@@ -37,3 +37,7 @@ Realizar login sem inclusão de token
     ${response}    POST On Session    alias=quality-eagles    url=${LOGIN.endpoint}    expected_status=${expectedStatus}    json=${body}
     RETURN    ${response}
 
+Criar headers com token
+    [Arguments]    ${token}
+    ${headers}=    Create Dictionary    Authorization=${token}
+    [Return]    ${headers}
