@@ -90,13 +90,23 @@ TC06 - Exclusão de usuário com sucesso
 
 TC07 - Exclusão de usuário com id inválido
     [Documentation]     Validar acesso negado à exclusão de usuários informando um id inválido
-    ${response}=    DELETE On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}=    DELETE On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}
+    ...  expected_status=any
     Status Should Be    400    ${response}
     Should Be Equal As Strings   ${response.json()["alert"][0]}    Esse usuário não existe em nossa base de dados.
 
 TC08 - Exclusão de usuário com token em branco
     [Documentation]     Validar acesso negado à exclusão de usuários com token em branco
-    ${response}=    DELETE On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=    DELETE On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}
+    ...  expected_status=any
     Status Should Be    403     ${response}
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
@@ -122,13 +132,23 @@ TC09 - Listagem de usuário com sucesso
 
 TC10 - Listagem de usuário com token inválido
     [Documentation]     Validar acesso negado à listagem de usuários com token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles 
+    ...     headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}
+    ...    expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
 TC11 - Listagem de usuário com token em branco
     [Documentation]     Validar acesso negado à listagem de usuários com token em branco
-    ${response}=   GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}    expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=   GET On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}
+    ...  expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
@@ -146,27 +166,46 @@ TC12- Listagem de usuário por id com sucesso
 
 TC13- Listagem de usuário por id com id inválido
     [Documentation]     Validar acesso negado à listagem de usuários por id com um id inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}=    GET On Session 
+    ...    alias=quality-eagles 
+    ...    headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${INVALID_USER_ID}
+    ...  expected_status=any
     Status Should Be    404
     Should Be Equal As Strings   ${response.json()["alert"][0]}    Esse usuário não existe em nossa base de dados.
 
 TC14- Listagem de usuário por id com token em branco
     [Documentation]     Validar acesso negado à listagem de usuários por id com o token em branco
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles 
+    ...    headers=${headers}
+    ...    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}
+    ...  expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
    
 TC15 - Contagem de usuário com sucesso
     [Documentation]    Realizar a contagem de todos os usuários cadastrados
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${response}    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}/?token=${TOKEN_USER}
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${response}    GET On Session 
+    ...    alias=quality-eagles 
+    ...     headers=${headers}
+    ...    url=/${USER_COUNT.url}${USER_COUNT.endpoint}/
     Status Should Be    200    ${response}
     # Validar conteúdo da resposta
     Dictionary Should Contain Key   ${response.json()}    count
 
 TC16 - Contagem de usuários com o token inválido
     [Documentation]     Validar acesso negado à contagem usuários com o token inválido
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}?token=${TOKEN_INVALID}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER_COUNT.url}${USER_COUNT.endpoint}
+    ...    expected_status=any
     Status Should Be    403
     Log    GET Count Users Response: ${response}
     Log To Console    ${response.json()["errors"][0]}
@@ -175,7 +214,12 @@ TC16 - Contagem de usuários com o token inválido
 
 TC17 - Contagem de usuário token em branco
     [Documentation]     Validar acesso negado à contagem usuários com o token em branco
-    ${response}=    GET On Session    alias=quality-eagles    url=/${USER_COUNT.url}${USER_COUNT.endpoint}?token=${TOKEN_BLANK}   expected_status=any
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
+    ${response}=    GET On Session
+    ...    alias=quality-eagles 
+    ...    headers=${headers}
+    ...    url=/${USER_COUNT.url}${USER_COUNT.endpoint}
+    ...  expected_status=any
     Status Should Be    403
     Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
 
@@ -228,8 +272,13 @@ TC22 - Atualização de senha por id com id inválido
     [Documentation]     Validar acesso negado à atualização de senha com id inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
+    ${headers}    Criar headers com token    ${TOKEN_USER}
     ${body}    Create Dictionary    password=${person}[password]    confirmPassword=${person}[password] 
-    ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}    expected_status=any   
+    ${response}    PUT On Session 
+    ...    alias=quality-eagles  
+    ...      headers=${headers}
+    ...    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${INVALID_USER_ID}
+    ...    expected_status=any   
     Status Should Be    400
     Should Be Equal    ${response.json()["msg"]}    Esse usuário não existe em nossa base de dados.
 
@@ -237,8 +286,13 @@ TC24 - Atualização de senha por id com token em branco
     [Documentation]     Validar acesso negado à atualização de senha informando um token em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
     ${body}    Create Dictionary    password=${person}[password]    confirmPassword=${person}[password] 
-    ${response}    PUT On Session    alias=quality-eagles    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}    expected_status=any   
+    ${response}    PUT On Session
+    ...    alias=quality-eagles
+    ...    headers=${headers}
+    ...    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${VALID_USER_ID}
+    ...    expected_status=any   
     Status Should Be    403
     Should Be Equal    ${response.json()["errors"][0]}    Failed to authenticate token.
 
@@ -256,13 +310,11 @@ TC24 - Atualização de status por id para true com sucesso
 TC25 - Atualização de status por id com id inválido
     [Documentation]     Validar acesso negado à atualizção de status com ID inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${headers}     Create Dictionary
-    ...     accept=application/json
-    ...     Content-Type=application/json
+    ${headers}    Criar headers com token    ${TOKEN_USER}
     ${body}     Create Dictionary     status=true
     ${response}     PUT On Session
     ...     alias=quality-eagles
-    ...     url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${INVALID_USER_ID}?token=${TOKEN_USER}
+    ...     url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${INVALID_USER_ID}
     ...     json=${body}
     ...     headers=${headers}
     ...     expected_status=any
@@ -273,13 +325,11 @@ TC25 - Atualização de status por id com id inválido
 TC26 - Atualização de status por id com token em branco
     [Documentation]     Validar acesso negado à atualização de status com o token em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${headers}     Create Dictionary
-    ...     accept=application/json
-    ...     Content-Type=application/json
+    ${headers}    Criar headers com token    ${TOKEN_BLANK}
     ${body}     Create Dictionary     status=true
     ${response}     PUT On Session
     ...     alias=quality-eagles
-    ...     url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${VALID_USER_ID}?token=${TOKEN_BLANK}
+    ...     url=/${USER_STATUS.url}${USER_STATUS.endpoint}/${VALID_USER_ID}
     ...     json=${body}
     ...     headers=${headers}
     ...     expected_status=any
