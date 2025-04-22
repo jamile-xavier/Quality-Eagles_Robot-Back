@@ -1,6 +1,8 @@
 from faker import Faker
 import unicodedata
 import re
+import random
+import string
 from robot.api.deco import keyword
 
 faker = Faker('pt-BR')
@@ -32,6 +34,28 @@ def limpar_cpf(cpf):
     cpf_sem_acentos = remover_acentos(cpf)
     return cpf_sem_acentos.replace('.', '').replace('-', '')
 
+
+def gerar_senha_segura(length=12):
+    """Gera senha com pelo menos uma letra maiúscula, minúscula, número e caractere especial."""
+    if length < 8:
+        raise ValueError("Senha deve ter pelo menos 8 caracteres.")
+
+    caracteres = {
+        'upper': random.choice(string.ascii_uppercase),
+        'lower': random.choice(string.ascii_lowercase),
+        'digit': random.choice(string.digits),
+        'special': random.choice('!@#$%^&*()-_=+'),
+    }
+
+    # Preenche o restante da senha com caracteres aleatórios
+    restante = random.choices(string.ascii_letters + string.digits + '!@#$%^&*()-_=+', k=length - 4)
+
+    # Junta todos e embaralha
+    senha_lista = list(caracteres.values()) + restante
+    random.shuffle(senha_lista)
+    return ''.join(senha_lista)
+
+
 @keyword("Get Fake User")
 def get_fake_user():
     """Gera dados de pessoa fictícia com formatação adequada."""
@@ -39,5 +63,5 @@ def get_fake_user():
         "name": limpar_ponto_nome(faker.name()),
         "email": faker.email(),
         "cpf": limpar_cpf(faker.cpf()),
-        "password": faker.password(length=12)
+        "password": gerar_senha_segura(length=12)
             }
