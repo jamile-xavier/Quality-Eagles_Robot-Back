@@ -156,3 +156,12 @@ Deletar usuário
 
     RETURN         ${response.json()}
 
+Contagem de usuário com sucesso
+    [Documentation]    Keyword para contagem de usuários
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${responseUser}    GET On Session 
+    ...    alias=quality-eagles 
+    ...     headers=${headers}
+    ...    url=/${USER_COUNT.url}${USER_COUNT.endpoint}/
+    RETURN    ${responseUser}   

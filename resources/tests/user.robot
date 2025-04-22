@@ -188,12 +188,7 @@ TC14- Listagem de usuário por id com token em branco
    
 TC15 - Contagem de usuário com sucesso
     [Documentation]    Realizar a contagem de todos os usuários cadastrados
-    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
-    ${headers}    Criar headers com token    ${TOKEN_USER}
-    ${response}    GET On Session 
-    ...    alias=quality-eagles 
-    ...     headers=${headers}
-    ...    url=/${USER_COUNT.url}${USER_COUNT.endpoint}/
+    ${response}   Contagem de usuário com sucesso    
     Status Should Be    200    ${response}
     # Validar conteúdo da resposta
     Dictionary Should Contain Key   ${response.json()}    count
