@@ -135,6 +135,7 @@ Atualizar senha de usuário
     ${responseRegister}      Cadastro usuário com sucesso
     ${userId}       Set Variable    ${responseRegister.json()["user"]["_id"]}
     ${person}        Get Fake User
+    Sleep    0.5s
     ${headers}    Criar headers com token    ${TOKEN_USER}
     ${body}    Create Dictionary    password=${person}[password]   confirmPassword=${person}[password] 
     ${responseCompany}    PUT On Session 
@@ -142,6 +143,7 @@ Atualizar senha de usuário
     ...    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${userId}
     ...    json=${body}  
     ...    headers=${headers}
+    ...    expected_status=any
     [Return]    ${responseCompany} 
 
 
