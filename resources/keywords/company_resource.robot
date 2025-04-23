@@ -155,6 +155,34 @@ Atualizar cadastro empresa por id
     ...    headers=${headers}
     RETURN    ${responseCompany}
 
+Atualizar cadastro empresa por id manual
+    [Documentation]    Keyword para atualizar o cadastro da empresa por id
+    [Arguments]    
+    ...    ${corporateName}
+    ...    ${registerCompany}
+    ...    ${mail}
+    ...    ${responsibleContact}
+    ...    ${telephone}
+    ...    ${serviceDescription}
+    ${response}    Cadastro Empresa Sucesso
+    ${company_id}    Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${body}    Create Dictionary    
+    ...    corporateName=${corporateName}
+    ...    registerCompany=${registerCompany}
+    ...    mail= ${mail}
+    ...    matriz="Teste"
+    ...    responsibleContact= ${responsibleContact}
+    ...    telephone= ${telephone}
+    ...    serviceDescription=${serviceDescription}
+    ${responseCompany}    PUT On Session
+    ...    alias=quality-eagles
+    ...    url=/${COMPANY.url}${COMPANY.endpoint}/${company_id}
+    ...    json=${body} 
+    ...    headers=${headers}
+    ...    expected_status=any
+    RETURN    ${responseCompany}
+
 Atualizar endereço da empresa
     [Documentation]    Keyword para realizar atualização de endereço da empresa
     ${responseCompany}    ${companyFake}     Realizar Login e cadastrar empresa retornando dados fake    
