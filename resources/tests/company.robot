@@ -320,7 +320,7 @@ TC20 - Atualização de cadastro da empresa por id com todos os campos em branco
     Status Should Be    400
    
      Should Be Equal As Strings   ${responseCompany.json()["error"][0]}    O campo 'Nome da empresa' da empresa é obrigatório
-     Should Be Equal As Strings   ${responseCompany.json()["error"][1]}    O campo 'Email' é obrigatório.
+     Should Be Equal As Strings   ${responseCompany.json()["error"][1]}    O campo 'Email' informado é inválido. Informe um e-mail no formato [nome@domínio.com].
      Should Be Equal As Strings   ${responseCompany.json()["error"][2]}    O campo 'CNPJ' da empresa é obrigatório.
      Should Be Equal As Strings   ${responseCompany.json()["error"][3]}    O campo 'Contado do Responsável' é obrigatório.
      Should Be Equal As Strings   ${responseCompany.json()["error"][4]}    O campo 'Telefone' é obrigatório.
