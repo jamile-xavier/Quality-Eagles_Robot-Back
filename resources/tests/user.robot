@@ -101,14 +101,16 @@ TC07 - Exclusão de usuário com id inválido
 
 TC08 - Exclusão de usuário com token em branco
     [Documentation]     Validar acesso negado à exclusão de usuários com token em branco
+    ${response}    Cadastro usuário com sucesso   
+    ${userId}       Set Variable    ${response.json()["user"]["_id"]}
     ${headers}    Criar headers com token    ${TOKEN_BLANK}
-    ${response}=    DELETE On Session
+    ${responseCompany}=    DELETE On Session
     ...    alias=quality-eagles
     ...    headers=${headers}
-    ...    url=/${USER.url}${USER.endpoint}/${VALID_USER_ID}
+    ...    url=/${USER.url}${USER.endpoint}/${userId}
     ...  expected_status=any
-    Status Should Be    403     ${response}
-    Should Be Equal As Strings   ${response.json()["errors"][0]}    Failed to authenticate token.
+    Status Should Be    403     ${responseCompany}
+    Should Be Equal As Strings   ${responseCompany.json()["errors"][0]}    Failed to authenticate token.
 
 TC09 - Listagem de usuário com sucesso
     [Documentation]    Listar todos os usuários cadastrados
