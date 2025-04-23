@@ -21,15 +21,6 @@ ${NUMBER_COMPANY_DUPLICATE}    124
 
 
 # Dados para teste de cadastro de empresa inválido e atualização de endereço
-${CORPORATE_NAME}    Comércio TechInnovate Educação
-${REGISTER_COMPANY}    14686715000154
-${MAIL_COMPANY}    comercial@techinnovate.com.br
 ${RESPONSIBLE_CONTACT}    Manuel Thirine
-${PHONE_COMPANY}    356987412547865
-${SERVICE_DESCRIPTION}    Venda de cursos de tecnologia
-${ZIP_CODE_COMPANY}    30190925
-${CITY_COMPANY}    Belo Horizonte
-${STATE_COMPANY}    MG
-${DISTRICT_COMPANY}    Belo Horizonte
-${STREET_COMPANY}    Rua Goiás
-${NUMBER_COMPANY}    244
+${LONG_CORPORATE_NAME}    Organização Internacional para Soluções Integradas em Engenharia, Consultoria, Logística e Tecnologia Avançada Ltda    
+${NUMBER_COMPANY_EXCEPTION}    11122233344

@@ -54,7 +54,7 @@ Realizar Login e cadastrar empresa retornando dados fake
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${companyFake}        Get Fake Company
     ${responseCompany}       Criar Empresa     ${companyFake}    
-    [Return]    ${responseCompany}  ${companyFake}         
+    RETURN    ${responseCompany}  ${companyFake}         
 
     
 Criar empresa manual
@@ -112,7 +112,7 @@ Listar empresa com sucesso
     ...    alias=quality-eagles
     ...    headers=${headers}
     ...    url=/${COMPANY.url}${COMPANY.endpoint}/
-    [Return]    ${responseCompany}
+    RETURN    ${responseCompany}
 
 Listar empresa por id
     [Documentation]    Keyword para listar empresa por id
@@ -133,7 +133,7 @@ Contagem de empresa com sucesso
     ...    alias=quality-eagles
     ...    headers=${headers}
     ...    url=/${COMPANY_COUNT.url}${COMPANY_COUNT.endpoint}/
-    [Return]    ${responseCompany}
+    RETURN    ${responseCompany}
 
 Atualizar cadastro empresa por id
     [Documentation]    Keyword para atualizar o cadastro da empresa por id
@@ -153,7 +153,7 @@ Atualizar cadastro empresa por id
     ...    url=/${COMPANY.url}${COMPANY.endpoint}/${company_id}
     ...    json=${body} 
     ...    headers=${headers}
-    [Return]    ${responseCompany}
+    RETURN    ${responseCompany}
 
 Atualizar endereço da empresa
     [Documentation]    Keyword para realizar atualização de endereço da empresa
@@ -185,7 +185,42 @@ Atualizar endereço da empresa
     ...    url=/${COMPANY_ADDRESS.url}${COMPANY_ADDRESS.endpoint}/${company_id}
     ...    json=${body}
     ...    headers=${headers}
-    [Return]    ${response}
+    RETURN    ${response}
+
+Atualizar endereço da empresa manual
+    [Documentation]    Keyword para realizar atualização de endereço da empresa de forma manual
+    [Arguments]    ${zipCode}    ${city}    ${state}    ${district}    ${street}    ${number}    
+    ${responseCompany}    ${companyFake}     Realizar Login e cadastrar empresa retornando dados fake        
+    ${companyId}    Set Variable    ${responseCompany.json()["newCompany"]["_id"]}
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${address}=    Create List
+    ${addressItem}=    Create Dictionary
+    ...    zipCode=${zipCode}
+    ...    city=${city} 
+    ...    state=${state} 
+    ...    district=${district} 
+    ...    street=${street}  
+    ...    number=${number} 
+    ...    complement=Loja
+    ...    country=Brasil
+    Append To List    ${address}    ${addressItem}
+    ${body}=    Create Dictionary
+    ...    corporateName=${responseCompany.json()["newCompany"]["corporateName"]}
+    ...    registerCompany=${responseCompany.json()["newCompany"]["registerCompany"]}
+    ...    mail=${responseCompany.json()["newCompany"]["mail"]}
+    ...    matriz=${responseCompany.json()["newCompany"]["matriz"]}
+    ...    responsibleContact=${responseCompany.json()["newCompany"]["responsibleContact"]}
+    ...    telephone=${responseCompany.json()["newCompany"]["telephone"]}
+    ...    serviceDescription=${responseCompany.json()["newCompany"]["serviceDescription"]}
+    ...    address=${address}
+    ${response}    PUT On Session
+    ...    alias=quality-eagles
+    ...    url=/${COMPANY_ADDRESS.url}${COMPANY_ADDRESS.endpoint}/${company_id}
+    ...    json=${body}
+    ...    headers=${headers}
+    ...    expected_status=any
+ 
+    RETURN    ${response}
  Atualizar status da empresa
     [Documentation]    Keyword para atualizar o status da empresa
     [Arguments]    ${status}

@@ -41,7 +41,7 @@ Realizar login e cadastrar usuário retornando dados fake
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
     ${responseUser}    Criar usuário    ${person}    
-    [Return]     ${responseUser}    ${person} 
+    RETURN    ${responseUser}    ${person} 
 Cadastro manual de usuário
     [Documentation]    Keyword para criar um usuário com dados manuais
     [Arguments]    ${name}    ${mail}    ${cpf}    ${password}    ${confirmPassword}
@@ -73,7 +73,7 @@ Listar usuário com sucesso
     ...    alias=quality-eagles
     ...    headers=${headers}
     ...    url=/${USER.url}${USER.endpoint}/
-    [Return]    ${responseUser}
+    RETURN    ${responseUser}
 Listar usuário por id
     [Documentation]    Keyword para listar usuários por id
     ${response}      Cadastro usuário com sucesso
@@ -96,7 +96,7 @@ Atualizar cadastro de usuário com sucesso
     ...     headers=${headers}
     ...    url=${USER.url}${USER.endpoint}/${user_id}
     ...  json=${body}   
-    [Return]    ${response}     ${person} 
+    RETURN    ${response}     ${person} 
 
 Atualização manual de cadastro usuário
     [Documentation]    Keyword para atualizar um usuário com dados manuais
@@ -144,8 +144,23 @@ Atualizar senha de usuário
     ...    json=${body}  
     ...    headers=${headers}
     ...    expected_status=any
-    [Return]    ${responseCompany} 
+    RETURN    ${responseCompany} 
 
+Atualizar senha de usuário manual
+    [Documentation]    Keyword para atualizar senha de usuário
+    [Arguments]    ${password}    
+    ${responseRegister}      Cadastro usuário com sucesso
+    ${userId}       Set Variable    ${responseRegister.json()["user"]["_id"]}
+    Sleep    0.5s
+    ${headers}    Criar headers com token    ${TOKEN_USER}
+    ${body}    Create Dictionary    password=${password}  confirmPassword=${password}
+    ${responseCompany}    PUT On Session 
+    ...    alias=quality-eagles  
+    ...    url=/${USER_PASSWORD.url}${USER_PASSWORD.endpoint}/${userId}
+    ...    json=${body}  
+    ...    headers=${headers}
+    ...    expected_status=any
+    RETURN    ${responseCompany} 
 
 Deletar usuário
     [Documentation]    Keyword para exclusão de usuário

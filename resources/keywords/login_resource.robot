@@ -40,4 +40,4 @@ Realizar login sem inclusão de token
 Criar headers com token
     [Arguments]    ${token}
     ${headers}=    Create Dictionary    Authorization=${token}
-    [Return]    ${headers}
+    RETURN    ${headers}

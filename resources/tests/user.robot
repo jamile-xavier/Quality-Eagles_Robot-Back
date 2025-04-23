@@ -234,7 +234,7 @@ TC18 - Atualização de cadastro com sucesso
     Log To Console    Novo email: ${updated_user["mail"]}
    
 
-TC19 - Atualização de cadastro sem nome completo
+TC19 - Atualização de cadastro sem nome completo - somente primeiro nome
     [Documentation]     Validar acesso negado à atualização de cadastro sem informar nome completo
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}    Get Fake User
@@ -244,7 +244,16 @@ TC19 - Atualização de cadastro sem nome completo
     Status Should Be    400   
     Should Be Equal    ${response.json()["error"][0]}    Informe o nome e sobrenome com as iniciais em letra maiúscula e sem caracteres especiais.
 
-TC20 - Atualização de cadastro sem email
+TC20 - Atualização de cadastro com nome completo em branco
+    [Documentation]     Validar acesso negado à atualização de cadastro sem informar nome completo
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}    Get Fake User
+    ${response}     Atualização manual de cadastro usuário
+    ...    fullName=
+    ...    mail=${person}[email]
+    Status Should Be    400   
+    Should Be Equal    ${response.json()["error"][0]}    Informe o nome e sobrenome com as iniciais em letra maiúscula e sem caracteres especiais.
+TC21 - Atualização de cadastro sem email
     [Documentation]     Validar acesso negado à atualização de cadastro sem informar o e-mail
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}    Get Fake User
@@ -254,7 +263,17 @@ TC20 - Atualização de cadastro sem email
     Status Should Be    400    
     Should Be Equal    ${response.json()["error"][1]}    O e-mail informado é inválido. Informe um e-mail no formato [nome@domínio.com].
 
-TC21 - Atualização de senha por id com sucesso
+TC22 - Atualização de cadastro com e-mail inválido
+    [Documentation]     Validar acesso negado à atualização de cadastro sem informar o e-mail
+    ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
+    ${person}    Get Fake User
+    ${response}     Atualização manual de cadastro usuário
+    ...    fullName=${person}[name]
+    ...    mail=${INVALID_MAIL}
+    Status Should Be    400    
+    Should Be Equal    ${response.json()["error"][1]}    O e-mail informado é inválido. Informe um e-mail no formato [nome@domínio.com].
+
+TC23 - Atualização de senha por id com sucesso
     [Documentation]    Atualizar senha do usuário utilizando seu id
     ${person}    Get Fake User
     ${response}   Atualizar senha de usuário    
@@ -263,7 +282,14 @@ TC21 - Atualização de senha por id com sucesso
     
     Log To Console    ${person}[password] 
     
-TC22 - Atualização de senha por id com id inválido
+TC24 - Atualização de senha por id com senha inválida
+    [Documentation]    Atualizar senha do usuário utilizando seu id informando uma senha inválida
+    ${response}   Atualizar senha de usuário manual    ${INVALID_PASSWORD} 
+    Status Should Be    400
+    Should Be Equal    ${response.json()["error"][0]}    Invalid value
+    
+    
+TC25 - Atualização de senha por id com id inválido
     [Documentation]     Validar acesso negado à atualização de senha com id inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
@@ -277,7 +303,7 @@ TC22 - Atualização de senha por id com id inválido
     Status Should Be    400
     Should Be Equal    ${response.json()["msg"]}    Esse usuário não existe em nossa base de dados.
 
-TC24 - Atualização de senha por id com token em branco
+TC26 - Atualização de senha por id com token em branco
     [Documentation]     Validar acesso negado à atualização de senha informando um token em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${person}        Get Fake User
@@ -291,18 +317,18 @@ TC24 - Atualização de senha por id com token em branco
     Status Should Be    403
     Should Be Equal    ${response.json()["errors"][0]}    Failed to authenticate token.
 
-TC23 -Atualização de status por id para false com sucesso
+TC27 -Atualização de status por id para false com sucesso
     [Documentation]    Atualizar o status para false utilizando o id do usuário
     ${response}      Atualizar status de usuário    status=false
     Status Should Be    200
     Should Be Equal    ${response['msg']}    Status do usuario atualizado com sucesso para status false.
-TC24 - Atualização de status por id para true com sucesso
+TC28 - Atualização de status por id para true com sucesso
     [Documentation]    Atualizar o status para true utilizando o id do usuário
     ${response}      Atualizar status de usuário       status=true
     Status Should Be    200
     Should Be Equal    ${response['msg']}    Status do usuario atualizado com sucesso para status true.
 
-TC25 - Atualização de status por id com id inválido
+TC29 - Atualização de status por id com id inválido
     [Documentation]     Validar acesso negado à atualizção de status com ID inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${headers}    Criar headers com token    ${TOKEN_USER}
@@ -317,7 +343,7 @@ TC25 - Atualização de status por id com id inválido
     # Verifica o status code
     Status Should Be     404
    
-TC26 - Atualização de status por id com token em branco
+TC30 - Atualização de status por id com token em branco
     [Documentation]     Validar acesso negado à atualização de status com o token em branco
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${headers}    Criar headers com token    ${TOKEN_BLANK}
