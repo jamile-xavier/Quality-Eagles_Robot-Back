@@ -144,15 +144,17 @@ TC07 - Exclusão de empresa com sucesso
     Should Be Equal   Companhia deletado com sucesso.    ${response["msg"]}
 
 TC08 - Exclusão de empresa com id inválido
-    [Documentation]     Validar acesso negado à exclusão de empresa informando um id inválido
-    ${headers}    Criar headers com token    ${TOKEN_USER}
-    ${response}=    DELETE On Session
+  [Documentation]     Validar acesso negado à exclusão de empresa informando um token inválido
+    ${response}    Cadastro Empresa Sucesso       
+    ${companyId}       Set Variable    ${response.json()["newCompany"]["_id"]}
+    ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${responseCompany}=    DELETE On Session 
     ...    alias=quality-eagles
-    ...    headers=${headers}  
-    ...    url=/${COMPANY}/${INVALID_COMPANY_ID}
-    ...  expected_status=any
-    Status Should Be    404   ${response}
-    #Should Be Equal As Strings   ${response.json()["msg"]}    Essa companhia não existem em nossa base de dados.
+    ...    headers=${headers} 
+    ...    url=/${COMPANY}/${companyId}
+    ...    expected_status=any
+    Status Should Be    403
+    Should Be Equal As Strings   ${responseCompany.json()["errors"][0]}    Failed to authenticate token.
 
 TC09 - Exclusão de empresa com token inválido
     [Documentation]     Validar acesso negado à exclusão de empresa informando um token inválido
@@ -260,8 +262,17 @@ TC17 - Atualização de cadastro da empresa por id com token inválido
     [Documentation]     Validar acesso negado à atualização de cadastro da empresa por id com um token inválido
     ${response}    Realizar login com token user   ${MAIL_USER}    ${PASSWORD_USER}    200
     ${headers}    Criar headers com token    ${TOKEN_INVALID}
+    ${fakeCompany}    Get Fake Company
+    ${body}    Create Dictionary 
+    ...    corporateName=${fakeCompany}[corporateName]
+    ...    registerCompany=${fakeCompany}[cnpj]
+    ...    mail=${fakeCompany}[corporateEmail]
+    ...    responsibleContact= ${fakeCompany}[responsibleName]
+    ...    telephone=${fakeCompany}[phone]
+    ...    serviceDescription=${fakeCompany}[serviceDescription]
     ${response}=    PUT On Session 
     ...    alias=quality-eagles
+    ...    json=${body}
     ...    headers=${headers}  
     ...    url=/${COMPANY.url}${COMPANY.endpoint}/${VALID_COMPANY_ID}
     ...  expected_status=any
